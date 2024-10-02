@@ -76,6 +76,8 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
 
+    implementation ("androidx.fragment:fragment-ktx:1.8.3")
+    implementation ("androidx.viewpager2:viewpager2:1.1.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

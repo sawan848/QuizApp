@@ -1,6 +1,5 @@
 package com.example.quizapp.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -34,7 +33,7 @@ class QuestionAdapter (
         RecyclerView.ViewHolder(binding.root) {
         fun bind(question: Question) {
             binding.textViewQuestionTitle.text = question.questionTitle
-            binding.category.text=question.category
+            binding.category.text="${question.id} ${question.category}"
             binding.difficultyLevel.text=question.difficultyLevel
             binding.radioGroupOptions.removeAllViews()
             addRadioButton(0,question.option1.toString())
@@ -42,15 +41,15 @@ class QuestionAdapter (
             addRadioButton(2,question.option3.toString())
 
 
-            binding.submitMCQ.setOnClickListener {
-                val selectedId=binding.radioGroupOptions.checkedRadioButtonId
-                if (selectedId!=-1){
-                    onAnswerSelected(adapterPosition,selectedId)
-                    selectedAnswers[adapterPosition]=selectedId
-                    binding.submitMCQ.isEnabled=false
-                }
-            }
-            binding.submitMCQ.isEnabled=selectedAnswers==null
+//            binding.submitMCQ.setOnClickListener {
+//                val selectedId=binding.radioGroupOptions.checkedRadioButtonId
+//                if (selectedId!=-1){
+//                    onAnswerSelected(adapterPosition,selectedId)
+//                    selectedAnswers[adapterPosition]=selectedId
+//                    binding.submitMCQ.isEnabled=false
+//                }
+//            }
+//            binding.submitMCQ.isEnabled=selectedAnswers==null
         }
         fun getSelectedAnswers(): Map<Int, Int> = selectedAnswers.toMap()
 

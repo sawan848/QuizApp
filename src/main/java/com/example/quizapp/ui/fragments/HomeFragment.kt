@@ -5,18 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.collectAsState
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 
-import com.example.quizapp.R
 import com.example.quizapp.adapter.QuestionAdapter
 import com.example.quizapp.databinding.FragmentHomeBinding
-import com.example.quizapp.model.Question
 import com.example.quizapp.ui.viewmodel.MainViewModel
 import com.example.quizapp.util.Results
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,13 +42,18 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
 
-        setAllQuestion()
-
+        setQuestion()
+        binding.backBtn.setOnClickListener {
+            viewModel.previousQuestion()
+        }
+        binding.nextBtn.setOnClickListener {
+            viewModel.nextQuestion()
+        }
     }
 
     private fun setupRecyclerView() {
         adapter= QuestionAdapter{
-            questionIndex,selectedAnswer->
+                questionIndex,selectedAnswer->
             viewModel.selectAnswer(questionIndex, selectedAnswer)
         }
 
@@ -60,34 +61,33 @@ class HomeFragment : Fragment() {
         binding.recyclerViewQuestions.adapter=adapter
 
     }
-
     private fun setAllQuestion() {
         viewLifecycleOwner.lifecycleScope.launch {
 
             viewModel.response.collect{
-              questions->
-                  when(questions){
-                      is Results.Success ->{
-                          Log.d("success",questions.data.toString())
-                          binding.progressBar.isVisible = false
-                          binding.recyclerViewQuestions.isVisible = true
-                          binding.textViewError.isVisible = false
-                          adapter.submitList(questions.data)
+                    questions->
+                when(questions){
+                    is Results.Success ->{
+                        Log.d("success",questions.data.toString())
+                        binding.progressBar.isVisible = false
+                        binding.recyclerViewQuestions.isVisible = true
+                        binding.textViewError.isVisible = false
+                        adapter.submitList(questions.data)
 
-                      }
-                      is Results.Loading->{
-                          Log.d("Loading","Loading")
-                          showLoading()
+                    }
+                    is Results.Loading->{
+                        Log.d("Loading","Loading")
+                        showLoading()
 
-                      }
-                      is Results.Error->{
-                          Log.d("Error",questions.error.toString())
-                          showError(questions.error.toString())
+                    }
+                    is Results.Error->{
+                        Log.d("Error",questions.error.toString())
+                        showError(questions.error.toString())
 
-                      }
-                      else ->Unit
+                    }
+                    else ->Unit
 
-            }
+                }
             }
         }
     }
@@ -102,4 +102,37 @@ class HomeFragment : Fragment() {
         binding.textViewError.isVisible = true
         binding.textViewError.text = message
     }
+    private fun setQuestion() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.currentQuestion.collect {question->
+                when (question) {
+                    is Results.Success -> {
+                        Log.d("success", question.data.toString())
+
+                        binding.progressBar.isVisible = false
+                        binding.recyclerViewQuestions.isVisible = true
+                        binding.textViewError.isVisible = false
+                        adapter.submitList(listOf(question.data))
+
+                    }
+
+                    is Results.Loading -> {
+                        Log.d("Loading", "Loading")
+                        showLoading()
+
+                    }
+
+                    is Results.Error -> {
+                        Log.d("Error", question.error.toString())
+                        showError(question.error.toString())
+
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+
+    }
+
 }
